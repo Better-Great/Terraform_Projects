@@ -22,7 +22,8 @@ In the HCP Terraform workspace, add a sensitive environment variable:
 - `NETLIFY_TOKEN` → your Netlify personal access token
 
 ### How credentials are handled
-- The Netlify provider reads `NETLIFY_TOKEN` from the environment. No tokens in code or `terraform.tfvars`.
+- The Netlify CLI uses `NETLIFY_TOKEN` from the environment for authentication. No tokens in code or `terraform.tfvars`.
+- The deployment uses Netlify CLI via Terraform's local-exec provisioner.
 
 ### Run it
 From `Static_Site_Deployment/`:
@@ -42,9 +43,14 @@ Output:
 
 ### Files of interest
 - `main.tf` – archives `Site/garage`, injects simple deploy metadata, calls the Netlify module
-- `modules/garage-netlify-site` – creates the site and deploys the archive
+- `modules/garage-netlify-site` – uses Netlify CLI to create the site and deploy the archive
 - `variables.tf` – inputs including randomizable content used for metadata
 - `outputs.tf` (module) – exposes `site_url`
+
+### Prerequisites for deployment
+- Node.js and npm (for Netlify CLI installation)
+- jq (for JSON parsing in the deployment script)
+- unzip utility
 
 ### .gitignore
 Add a repo-level `.gitignore` with Terraform and local files excluded (example shown below in this README’s tips).

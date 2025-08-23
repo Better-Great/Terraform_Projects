@@ -3,8 +3,8 @@ terraform {
   
   required_providers {
     netlify = {
-      source  = "AegirHealth/netlify"
-      version = "~> 0.15.0"
+      source  = "netlify/netlify"
+      version = ">= 0.1.0"
     }
     archive = {
       source  = "hashicorp/archive"
@@ -17,6 +17,10 @@ terraform {
     local = {
       source  = "hashicorp/local"
       version = "~> 2.5.1"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.2.0"
     }
   }
   

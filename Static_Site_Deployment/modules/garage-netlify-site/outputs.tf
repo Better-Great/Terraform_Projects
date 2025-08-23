@@ -1,4 +1,4 @@
 output "site_url" {
   description = "The live Netlify site URL."
-  value       = netlify_site.this.ssl_url
+  value       = trimspace(split("=", data.local_file.netlify_output.content)[1])
 }
