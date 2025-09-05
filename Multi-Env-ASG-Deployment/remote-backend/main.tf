@@ -3,11 +3,15 @@
 
 terraform {
   required_version = ">= 1.0"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
     }
   }
 }
@@ -16,9 +20,14 @@ provider "aws" {
   region = var.aws_region
 }
 
+# Generate random suffix for unique bucket names
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
+}
+
 # S3 Bucket for Dev Environment State
 resource "aws_s3_bucket" "terraform_state_dev" {
-  bucket = "terraform-state-webapp-dev-12345"  # Change this to your unique bucket name
+  bucket = "terraform-state-webapp-dev-${random_id.bucket_suffix.hex}"
 
   tags = {
     Name        = "Terraform State Dev"
@@ -29,7 +38,7 @@ resource "aws_s3_bucket" "terraform_state_dev" {
 
 # S3 Bucket for Prod Environment State
 resource "aws_s3_bucket" "terraform_state_prod" {
-  bucket = "terraform-state-webapp-prod-12345"  # Change this to your unique bucket name
+  bucket = "terraform-state-webapp-prod-${random_id.bucket_suffix.hex}"
 
   tags = {
     Name        = "Terraform State Prod"
@@ -98,9 +107,9 @@ resource "aws_s3_bucket_public_access_block" "terraform_state_prod" {
 
 # DynamoDB table for state locking
 resource "aws_dynamodb_table" "terraform_locks" {
-  name           = "terraform-locks-webapp"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "LockID"
+  name         = "terraform-locks-webapp"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
 
   attribute {
     name = "LockID"

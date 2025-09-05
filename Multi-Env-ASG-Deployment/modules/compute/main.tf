@@ -1,4 +1,30 @@
-# Get latest Amazon Linux 2 AMI
+# Create TLS private key for SSH access
+resource "tls_private_key" "main" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# Create AWS key pair
+resource "aws_key_pair" "main" {
+  key_name   = var.key_pair_name
+  public_key = tls_private_key.main.public_key_openssh
+
+  tags = merge(
+    var.common_tags,
+    {
+      Name = var.key_pair_name
+    }
+  )
+}
+
+# Store private key in local file (for dev/testing purposes)
+resource "local_file" "private_key" {
+  content  = tls_private_key.main.private_key_pem
+  filename = "${path.root}/${var.key_pair_name}.pem"
+  file_permission = "0600"
+}
+
+# Get latest Ubuntu 22.04 AMI
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"]
@@ -10,7 +36,7 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "virtualization-type"
-    values = ["hvm-ssd"]
+    values = ["hvm"]
   }
 }
 
@@ -74,9 +100,9 @@ resource "aws_lb_listener" "main" {
 # Launch Template
 resource "aws_launch_template" "main" {
   name_prefix   = "${var.environment}-lt-"
-  image_id      = data.aws_ami.amazon_linux.id
+  image_id      = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
-  key_name      = var.key_pair_name
+  key_name      = aws_key_pair.main.key_name
 
   vpc_security_group_ids = [var.web_security_group_id]
 
@@ -85,6 +111,7 @@ resource "aws_launch_template" "main" {
     db_name     = var.db_name
     db_username = var.db_username
     db_password = var.db_password
+    db_port     = var.db_port
     app_port    = var.app_port
   }))
 

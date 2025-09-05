@@ -25,8 +25,9 @@ resource "aws_db_parameter_group" "main" {
   dynamic "parameter" {
     for_each = var.db_parameters
     content {
-      name  = parameter.value.name
-      value = parameter.value.value
+      name         = parameter.value.name
+      value        = parameter.value.value
+      apply_method = parameter.value.apply_method
     }
   }
 

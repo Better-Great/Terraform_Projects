@@ -25,19 +25,19 @@ variable "database_security_group_id" {
 variable "db_engine" {
   description = "Database engine"
   type        = string
-  default     = "mysql"
+  default     = "postgres"
 }
 
 variable "db_engine_version" {
   description = "Database engine version"
   type        = string
-  default     = "8.0"
+  default     = "17.1"
 }
 
 variable "db_family" {
   description = "Database parameter group family"
   type        = string
-  default     = "mysql8.0"
+  default     = "postgres17"
 }
 
 variable "db_instance_class" {
@@ -67,7 +67,7 @@ variable "db_password" {
 variable "db_port" {
   description = "Database port"
   type        = number
-  default     = 3306
+  default     = 5432
 }
 
 # Storage Configuration
@@ -151,13 +151,15 @@ variable "skip_final_snapshot" {
 variable "db_parameters" {
   description = "Database parameters"
   type = list(object({
-    name  = string
-    value = string
+    name         = string
+    value        = string
+    apply_method = optional(string, "immediate")
   }))
   default = [
     {
-      name  = "innodb_buffer_pool_size"
-      value = "{DBInstanceClassMemory*3/4}"
+      name         = "shared_preload_libraries"
+      value        = "pg_stat_statements"
+      apply_method = "pending-reboot"
     }
   ]
 }
