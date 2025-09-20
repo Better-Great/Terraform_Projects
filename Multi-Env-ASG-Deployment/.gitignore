@@ -1,26 +1,63 @@
-# Terraform files
-*.tfstate
-*.tfstate.*
-*.tfvars.backup
+# Terraform
 .terraform/
 .terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfplan
+*.tfstate
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 
-# Dynamically generated backend configurations
-environments/*/backend.tf
+# Terraform crash log files
+crash.log
+crash.*.log
 
-# SSH Keys
-*.pem
-*.key
-
-# OS files
-.DS_Store
-Thumbs.db
+# Environment variables
+.env
+.env.local
+.env.*.local
 
 # IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# SSH Keys
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.pytest_cache/
 
 # Logs
 *.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/

@@ -39,7 +39,7 @@ asg_desired_capacity = 4
 
 # Database Configuration (Production settings)
 db_name             = "webappdb"
-db_username         = "admin"
+db_username         = "postgres"
 db_password         = "ProdSecurePassword456!"  # Change this to a very secure password
 db_instance_class   = "db.t3.small"
 db_allocated_storage = 20

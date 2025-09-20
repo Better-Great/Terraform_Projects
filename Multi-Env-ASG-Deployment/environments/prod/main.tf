@@ -121,10 +121,11 @@ module "compute" {
   low_cpu_threshold  = 30  # Scale down later
 
   # Database Connection
-  db_endpoint = module.database.db_instance_endpoint
+  db_endpoint = module.database.db_instance_address
   db_name     = module.database.db_name
   db_username = module.database.db_username
   db_password = module.database.db_password
+  db_port     = var.db_port
 
   depends_on = [module.networking, module.database]
 }
