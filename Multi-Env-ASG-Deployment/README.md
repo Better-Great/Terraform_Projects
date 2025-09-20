@@ -79,11 +79,17 @@ terraform apply
 
 After deployment, you'll get:
 - **Application URL**: `http://dev-alb-xxxxxxxxx.us-east-1.elb.amazonaws.com`
-- **Features Available**:
-  - User registration form
-  - User data retrieval by ID
-  - User management (view/delete)
-  - Automatic data persistence
+
+### 🎉 **Live Demo Available**
+**Current Working Example**: [http://dev-alb-1856004259.us-east-1.elb.amazonaws.com](http://dev-alb-1856004259.us-east-1.elb.amazonaws.com)
+
+**Features Available**:
+- ✅ **User Registration Form**: Add new users with name, email, password, address, phone
+- ✅ **Data Retrieval**: Fetch user data by ID  
+- ✅ **User Management**: View and delete user records
+- ✅ **Database Persistence**: All data stored in PostgreSQL RDS
+- ✅ **Auto Scaling**: Load balancer distributing traffic across multiple servers
+- ✅ **Health Monitoring**: Automatic replacement of unhealthy instances
 
 ## 📁 Project Structure
 

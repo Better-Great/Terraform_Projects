@@ -17,57 +17,43 @@ resource "null_resource" "netlify_deployment" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      # Install Netlify CLI if not present
-      if ! command -v netlify &> /dev/null; then
-        npm install -g netlify-cli
+      set -e
+      
+      if [ -z "$NETLIFY_TOKEN" ]; then
+        echo "Error: NETLIFY_TOKEN environment variable is required"
+        exit 1
       fi
       
-      # Create site and deploy
-      cd $(dirname "${var.site_zip_path}")
+      echo "Deploying ${var.site_name} from ${var.site_zip_path}"
       
-      # Extract the zip file to a temp directory
-      TEMP_DIR=$(mktemp -d)
-      unzip -q "${var.site_zip_path}" -d "$TEMP_DIR"
+      # Check if site exists
+      SITE_ID=$(curl -s -H "Authorization: Bearer $NETLIFY_TOKEN" \
+          "https://api.netlify.com/api/v1/sites" | \
+          jq -r '.[] | select(.name=="${var.site_name}") | .id' 2>/dev/null || echo "")
       
-      # Create or update the site
-      cd "$TEMP_DIR"
-      
-      # Check if site exists, if not create it
-      SITE_ID=$(netlify sites:list --json 2>/dev/null | jq -r '.[] | select(.name=="${var.site_name}") | .id' 2>/dev/null || echo "")
-      
+      # Create site if it doesn't exist
       if [ -z "$SITE_ID" ]; then
         echo "Creating new site: ${var.site_name}"
-        # Create site and capture the output
-        CREATE_OUTPUT=$(netlify sites:create --name "${var.site_name}" --manual --json 2>/dev/null || netlify sites:create --name "${var.site_name}" --manual)
-        SITE_ID=$(echo "$CREATE_OUTPUT" | jq -r '.id' 2>/dev/null || netlify sites:list --json | jq -r '.[] | select(.name=="${var.site_name}") | .id')
+        SITE_DATA=$(curl -s -X POST \
+            -H "Authorization: Bearer $NETLIFY_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"name":"${var.site_name}"}' \
+            "https://api.netlify.com/api/v1/sites")
+        SITE_ID=$(echo "$SITE_DATA" | jq -r '.id')
+        echo "Created site with ID: $SITE_ID"
       fi
       
+      # Deploy the site
       echo "Deploying to site ID: $SITE_ID"
-      # Deploy and capture the deploy URL
-      DEPLOY_OUTPUT=$(netlify deploy --prod --dir . --site "$SITE_ID" --message "${var.deployment_timestamp}" --json 2>/dev/null || netlify deploy --prod --dir . --site "$SITE_ID" --message "${var.deployment_timestamp}")
+      DEPLOY_RESPONSE=$(curl -s -X POST \
+          -H "Authorization: Bearer $NETLIFY_TOKEN" \
+          -H "Content-Type: application/zip" \
+          --data-binary "@${var.site_zip_path}" \
+          "https://api.netlify.com/api/v1/sites/$SITE_ID/deploys")
       
-      # Get the site URL - try multiple methods
-      SITE_URL=""
-      if [ -n "$DEPLOY_OUTPUT" ]; then
-        SITE_URL=$(echo "$DEPLOY_OUTPUT" | jq -r '.url // .deploy_url // .site_url' 2>/dev/null)
-      fi
-      
-      # Fallback: get URL from sites list
-      if [ -z "$SITE_URL" ] || [ "$SITE_URL" = "null" ]; then
-        SITE_URL=$(netlify sites:list --json 2>/dev/null | jq -r '.[] | select(.id=="'$SITE_ID'") | .url' 2>/dev/null)
-      fi
-      
-      # Final fallback: construct URL from site name
-      if [ -z "$SITE_URL" ] || [ "$SITE_URL" = "null" ]; then
-        SITE_URL="https://${var.site_name}.netlify.app"
-      fi
-      
-      # Clean up
-      rm -rf "$TEMP_DIR"
-      
-      # Output the site URL
-      echo "NETLIFY_URL=$SITE_URL" > /tmp/netlify_output.env
-      echo "Site deployed successfully: $SITE_URL"
+      DEPLOY_URL=$(echo "$DEPLOY_RESPONSE" | jq -r '.ssl_url // .url')
+      echo "NETLIFY_URL=$DEPLOY_URL" > /tmp/netlify_output.env
+      echo "Site deployed successfully: $DEPLOY_URL"
     EOT
   }
   
