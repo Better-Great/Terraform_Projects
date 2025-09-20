@@ -31,13 +31,13 @@ variable "db_engine" {
 variable "db_engine_version" {
   description = "Database engine version"
   type        = string
-  default     = "17.1"
+  default     = "16.4"
 }
 
 variable "db_family" {
   description = "Database parameter group family"
   type        = string
-  default     = "postgres17"
+  default     = "postgres16"
 }
 
 variable "db_instance_class" {
@@ -54,7 +54,7 @@ variable "db_name" {
 variable "db_username" {
   description = "Database master username"
   type        = string
-  default     = "admin"
+  default     = "postgres"
 }
 
 variable "db_password" {

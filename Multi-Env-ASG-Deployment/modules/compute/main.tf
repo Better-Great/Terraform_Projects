@@ -24,14 +24,14 @@ resource "local_file" "private_key" {
   file_permission = "0600"
 }
 
-# Get latest Ubuntu 22.04 AMI
+# Get latest Ubuntu 22.04 (Jammy) AMI
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"]
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-22.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
 
   filter {

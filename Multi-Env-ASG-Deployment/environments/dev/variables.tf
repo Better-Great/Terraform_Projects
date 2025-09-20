@@ -99,7 +99,7 @@ variable "db_name" {
 variable "db_username" {
   description = "Database username"
   type        = string
-  default     = "admin"
+  default     = "postgres"
 }
 
 variable "db_password" {

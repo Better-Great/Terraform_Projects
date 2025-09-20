@@ -28,7 +28,12 @@ provider "aws" {
   region = var.aws_region
 
   default_tags {
-    tags = local.common_tags
+    tags = {
+      Environment = var.environment
+      Project     = var.project_name
+      ManagedBy   = "Terraform"
+      Owner       = var.owner
+    }
   }
 }
 
@@ -39,7 +44,6 @@ locals {
     Project     = var.project_name
     ManagedBy   = "Terraform"
     Owner       = var.owner
-    CreatedDate = timestamp()
   }
 }
 
@@ -113,7 +117,7 @@ module "compute" {
   asg_desired_capacity = var.asg_desired_capacity
 
   # Database Connection
-  db_endpoint = module.database.db_instance_endpoint
+  db_endpoint = module.database.db_instance_address
   db_name     = module.database.db_name
   db_username = module.database.db_username
   db_password = module.database.db_password

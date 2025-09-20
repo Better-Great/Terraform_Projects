@@ -39,7 +39,7 @@ asg_desired_capacity = 2
 
 # Database Configuration
 db_name              = "webappdb"
-db_username          = "admin"
+db_username          = "postgres"
 db_password          = "DevPassword123!" # Change this to a secure password
 db_instance_class    = "db.t3.micro"
 db_allocated_storage = 20
