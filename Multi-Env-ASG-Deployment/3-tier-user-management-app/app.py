@@ -2,16 +2,20 @@ from flask import Flask, render_template, request, redirect, url_for
 import psycopg2
 import bcrypt
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
-# PostgreSQL configurations
+# PostgreSQL configurations - loaded from .env file
 DATABASE_CONFIG = {
-    'host': os.environ.get('DB_HOST', 'localhost'),
-    'database': os.environ.get('DB_NAME', 'webappdb'),
-    'user': os.environ.get('DB_USERNAME', 'admin'),
-    'password': os.environ.get('DB_PASSWORD', ''),
-    'port': os.environ.get('DB_PORT', '5432')
+    'host': os.environ.get('DB_HOST'),
+    'database': os.environ.get('DB_NAME'),
+    'user': os.environ.get('DB_USERNAME'),
+    'password': os.environ.get('DB_PASSWORD'),
+    'port': os.environ.get('DB_PORT')
 }
 
 # Connect to PostgreSQL
